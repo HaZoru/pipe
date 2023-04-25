@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,9 +45,10 @@ class _AlbumListViewState extends State<AlbumListView> {
     };
     final uri =
         Uri.http(widget.server.host, '/rest/getAlbumList', queryParameters);
-    final res = await http.get(uri);
+    final res =
+        await http.get(uri, headers: {"Content-Type": "application/json"});
     print(res.body);
-    return albumListFromJson(res.body);
+    return albumListFromJson(utf8.decode(res.bodyBytes));
   }
 
   String getAlbumCoverUrl(String coverId, int size) {
@@ -89,8 +92,19 @@ class _AlbumListViewState extends State<AlbumListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: ListView.builder(
+    return Scaffold(
+        appBar: AppBar(
+            toolbarHeight: MediaQuery.of(context).size.height * 10 / 100,
+            surfaceTintColor: Colors.teal,
+            leadingWidth: 1000,
+            leading: const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                'Pipe',
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
+              ),
+            )),
+        body: ListView.builder(
             cacheExtent: 10000,
             itemCount: albumList.length + 1,
             itemBuilder: (_, idx) {

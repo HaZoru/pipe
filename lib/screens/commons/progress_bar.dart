@@ -33,10 +33,10 @@ class AudioProgressBar extends StatelessWidget {
           total: total,
           onSeek: _audioPlayer.seek,
           // barHeight: _barHeight,
-          // baseBarColor: _baseBarColor,
-          // progressBarColor: _progressBarColor,
-          // bufferedBarColor: _bufferedBarColor,
-          // thumbColor: _thumbColor,
+          bufferedBarColor: Color.fromRGBO(22, 50, 43, 1),
+          baseBarColor: Color.fromRGBO(24, 42, 55, 1),
+          progressBarColor: Colors.teal,
+          thumbColor: Colors.teal,
           // thumbGlowColor: _thumbGlowColor,
           // barCapShape: _barCapShape,
           // thumbRadius: _thumbRadius,
@@ -71,6 +71,8 @@ class AudioProgressBar extends StatelessWidget {
           thumbRadius: 0,
           thumbCanPaintOutsideBar: false,
           timeLabelLocation: TimeLabelLocation.none,
+          baseBarColor: Color.fromRGBO(46, 73, 93, 1),
+          progressBarColor: Colors.teal,
         );
       },
     );

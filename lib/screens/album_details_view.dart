@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -33,7 +35,7 @@ class AlbumDetailsView extends StatelessWidget {
     };
     final uri = Uri.http(server.host, '/rest/getAlbum', queryParameters);
     final res = await http.get(uri);
-    return albumInfoFromJson(res.body);
+    return albumInfoFromJson(utf8.decode(res.bodyBytes));
   }
 
   getSongStream(String songId) {
@@ -70,6 +72,7 @@ class AlbumDetailsView extends StatelessWidget {
                   queue.add(AudioSource.uri(getSongStream(song.id!),
                       tag: AudioMetadata(
                           title: song.title,
+                          artist: song.artist,
                           album: song.album,
                           artwork: albumCover)));
                 }

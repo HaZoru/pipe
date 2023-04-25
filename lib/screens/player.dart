@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:pipe/models/audio_metadata.dart';
 import 'package:pipe/models/duration_state.dart';
 import 'package:pipe/models/server.dart';
 import 'package:pipe/screens/album_details_view.dart';
 import 'package:pipe/screens/album_list_view.dart';
-import 'package:pipe/screens/commons/player_buttons.dart';
-import 'package:pipe/screens/commons/queue.dart';
-import 'package:pipe/screens/commons/progress_bar.dart';
+import 'package:pipe/screens/commons/miniplayer.dart';
 import 'package:pipe/screens/now_playing.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -67,7 +64,6 @@ class _PlayerState extends State<Player> {
                           'albumDetails', // Optional, add name to your routes. Allows you navigate by name instead of path
                       path: 'albumDetails',
                       builder: (context, state) {
-                        print(state.params['albumCover']);
                         return AlbumDetailsView(
                           pc: _pc,
                           server: server,
@@ -106,8 +102,8 @@ class _PlayerState extends State<Player> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({
+class HomePage extends StatefulWidget {
+  HomePage({
     Key? key,
     required PanelController pc,
     required AudioPlayer audioPlayer,
@@ -123,130 +119,62 @@ class HomePage extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          toolbarHeight: MediaQuery.of(context).size.height * 10 / 100,
-          surfaceTintColor: Colors.teal,
-          leadingWidth: 1000,
-          leading: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              'Pipe',
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
-            ),
-          )),
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      body: SlidingUpPanel(
-        controller: _pc,
-        collapsed:
-            MiniPlayer(audioPlayer: _audioPlayer, durationState: durationState),
-        maxHeight: MediaQuery.of(context).size.height,
-        minHeight: MediaQuery.of(context).size.height * 10 / 100,
-        panel: Center(
-          child: NowPlaying(_audioPlayer, durationState),
-        ),
-        body: child,
-      ),
-    );
-  }
+  State<HomePage> createState() => _HomePageState();
 }
 
-class MiniPlayer extends StatelessWidget {
-  const MiniPlayer({
-    Key? key,
-    required AudioPlayer audioPlayer,
-    required this.durationState,
-  })  : _audioPlayer = audioPlayer,
-        super(key: key);
-
-  final AudioPlayer _audioPlayer;
-  final Stream<DurationState> durationState;
+class _HomePageState extends State<HomePage> {
+  bool panelOpened = false;
+  double opacity = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      surfaceTintColor: Colors.teal,
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            StreamBuilder<SequenceState?>(
-              stream: _audioPlayer.sequenceStateStream,
-              builder: (context, snapshot) {
-                final state = snapshot.data;
-                final sequence = state?.sequence ?? [];
-                final current = state?.currentIndex;
-                return Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (current != null)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(3, 0, 8, 0),
-                          child: Image(
-                              height: 45,
-                              width: 45,
-                              fit: BoxFit.cover,
-                              image:
-                                  NetworkImage(sequence[current].tag.artwork)),
-                        ),
-                      Expanded(
-                        flex: 4,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (current != null)
-                              Text(
-                                sequence[current].tag.title,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            if (current != null)
-                              Text(
-                                sequence[current].tag.album,
-                                overflow: TextOverflow.ellipsis,
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.grey),
-                              ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          StreamBuilder<PlayerState>(
-                            stream: _audioPlayer.playerStateStream,
-                            builder: (_, snapshot) {
-                              final playerState = snapshot.data;
-                              return PlayPauseButton(
-                                audioPlayer: _audioPlayer,
-                                playerState: playerState,
-                              );
-                            },
-                          ),
-                          StreamBuilder<SequenceState?>(
-                            stream: _audioPlayer.sequenceStateStream,
-                            builder: (_, __) {
-                              return NextButton(audioPlayer: _audioPlayer);
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            AudioProgressBar(
-              _audioPlayer,
-              durationState,
-              noSeek: true,
-            ),
-          ],
+    return Scaffold(
+      body: SlidingUpPanel(
+        onPanelSlide: (position) {
+          setState(() {
+            opacity = position;
+          });
+          // if (position < 0.6) {
+          //   bool prevVal = panelOpened;
+          //   panelOpened = false;
+          //   if (prevVal != panelOpened) {
+          //     setState(() {});
+          //   }
+          // } else {
+          //   bool prevVal = panelOpened;
+          //   panelOpened = true;
+          //   if (prevVal != panelOpened) {
+          //     setState(() {});
+          //   }
+          // }
+        },
+        controller: widget._pc,
+        collapsed: MiniPlayer(
+          audioPlayer: widget._audioPlayer,
+          durationState: widget.durationState,
+          pc: widget._pc,
         ),
+        maxHeight: MediaQuery.of(context).size.height,
+        minHeight: MediaQuery.of(context).size.height * 10 / 100,
+        // panel: panelOpened
+        //     ? Center(
+        //         child: NowPlaying(widget._audioPlayer, widget.durationState),
+        //       )
+        //     : AnimatedContainer(
+        //         color: Colors.green,
+        //         duration: Duration(seconds: 1),
+        //       ),
+        panel: Container(
+          color: Colors.black,
+          child: AnimatedOpacity(
+            opacity: opacity,
+            duration: Duration(
+              seconds: 1,
+            ),
+            child: NowPlaying(widget._audioPlayer, widget.durationState),
+          ),
+        ),
+        body: widget.child,
       ),
     );
   }
