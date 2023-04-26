@@ -3,41 +3,52 @@ import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/duration_state.dart';
 import 'package:pipe/screens/commons/player_buttons.dart';
 import 'package:pipe/screens/commons/progress_bar.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class NowPlaying extends StatelessWidget {
-  const NowPlaying(this._audioPlayer, this.durationState, {Key? key})
+  const NowPlaying(this._audioPlayer, this.durationState,
+      {Key? key, required this.pc})
       : super(key: key);
   final AudioPlayer _audioPlayer;
   final Stream<DurationState> durationState;
+  final PanelController pc;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Icon(Icons.expand_more),
-        ),
-        leadingWidth: 30,
-        toolbarHeight: 90,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Now Playing',
-              style: TextStyle(fontWeight: FontWeight.w900),
+        toolbarHeight: 80,
+        flexibleSpace: SafeArea(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            Center(
+              child: IconButton(
+                icon: const Icon(Icons.expand_more),
+                onPressed: () {
+                  pc.close();
+                },
+              ),
             ),
-            StreamBuilder<SequenceState?>(
-                stream: _audioPlayer.sequenceStateStream,
-                builder: (context, snapshot) {
-                  final state = snapshot.data;
-                  final List sequence = state?.sequence ?? [];
-                  final int? current = state?.currentIndex;
-                  return Text(
-                    current != null ? sequence[current].tag.album : '',
-                    style: TextStyle(fontSize: 16),
-                  );
-                })
-          ],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Now Playing',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                ),
+                StreamBuilder<SequenceState?>(
+                    stream: _audioPlayer.sequenceStateStream,
+                    builder: (context, snapshot) {
+                      final state = snapshot.data;
+                      final List sequence = state?.sequence ?? [];
+                      final int? current = state?.currentIndex;
+                      return Text(
+                        current != null ? sequence[current].tag.album : '',
+                        style: TextStyle(fontSize: 16),
+                      );
+                    })
+              ],
+            ),
+          ]),
         ),
       ),
       body: StreamBuilder<SequenceState?>(

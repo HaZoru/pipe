@@ -66,12 +66,13 @@ class AlbumListClass {
     this.album,
   });
 
-  final List<Album>? album;
+  final List<AlbumMetaData>? album;
 
   factory AlbumListClass.fromJson(Map<String, dynamic> json) => AlbumListClass(
         album: json["album"] == null
             ? []
-            : List<Album>.from(json["album"]!.map((x) => Album.fromJson(x))),
+            : List<AlbumMetaData>.from(
+                json["album"]!.map((x) => AlbumMetaData.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -81,8 +82,8 @@ class AlbumListClass {
       };
 }
 
-class Album {
-  Album({
+class AlbumMetaData {
+  AlbumMetaData({
     this.id,
     this.parent,
     this.isDir,
@@ -124,7 +125,7 @@ class Album {
   final bool? isVideo;
   final int? userRating;
 
-  factory Album.fromJson(Map<String, dynamic> json) => Album(
+  factory AlbumMetaData.fromJson(Map<String, dynamic> json) => AlbumMetaData(
         id: json["id"],
         parent: json["parent"],
         isDir: json["isDir"],

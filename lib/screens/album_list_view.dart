@@ -1,23 +1,21 @@
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:pipe/common_func/cover_art_url.dart';
 import 'package:pipe/models/albumList.dart';
-import 'package:pipe/models/album_cover.dart';
 import 'package:pipe/models/server.dart';
 import 'package:http/http.dart' as http;
-import 'package:pipe/screens/album_details_view.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class AlbumListView extends StatefulWidget {
-  AlbumListView(
-      {Key? key,
-      required this.server,
-      required this.audioPlayer,
-      required this.pc})
-      : super(key: key);
+  AlbumListView({
+    Key? key,
+    required this.server,
+    required this.audioPlayer,
+    required this.pc,
+  }) : super(key: key);
   final Server server;
   final AudioPlayer audioPlayer;
   final PanelController pc;
@@ -27,7 +25,7 @@ class AlbumListView extends StatefulWidget {
 }
 
 class _AlbumListViewState extends State<AlbumListView> {
-  final List<Album> albumList = [];
+  final List<AlbumMetaData> albumList = [];
   int offset = 0;
   int size = 30;
   bool listIsOver = false;
@@ -51,29 +49,12 @@ class _AlbumListViewState extends State<AlbumListView> {
     return albumListFromJson(utf8.decode(res.bodyBytes));
   }
 
-  String getAlbumCoverUrl(String coverId, int size) {
-    final queryParameters = {
-      'u': widget.server.username,
-      'p': widget.server.password,
-      'v': widget.server.version,
-      'c': widget.server.appName,
-      'f': widget.server.responseFormat,
-      'id': coverId,
-      'size': size.toString()
-    };
-    final uri =
-        Uri.http(widget.server.host, '/rest/getCoverArt', queryParameters);
-    return uri.toString();
-  }
-
   void appendAlbums() {
     if (listIsOver) {
       return;
     }
-    print('getting more');
-    print(listIsOver);
     getAlbumList(offset: offset).then((res) {
-      Iterable<Album> albums = res.subsonicResponse!.albumList!.album!;
+      Iterable<AlbumMetaData> albums = res.subsonicResponse!.albumList!.album!;
       if (albums.isEmpty) {
         listIsOver = true;
       } else {
@@ -120,20 +101,17 @@ class _AlbumListViewState extends State<AlbumListView> {
                   );
                 }
               } else {
-                Album album = albumList[idx];
+                AlbumMetaData album = albumList[idx];
                 return ListTile(
                   onTap: () {
-                    String albumCover = getAlbumCoverUrl(album.coverArt!, 500);
-                    context.goNamed("albumDetails", queryParams: {
-                      'albumId': album.id!,
-                      'albumCover': albumCover
-                    });
+                    context.goNamed("albumDetails", extra: album);
                   },
                   leading: CachedNetworkImage(
                       height: 55,
                       width: 55,
                       fit: BoxFit.cover,
-                      imageUrl: getAlbumCoverUrl(album.coverArt!, 100)),
+                      imageUrl: getAlbumCoverUrl(
+                          album.coverArt!, 100, widget.server)),
                   title: Text(
                     album.title!,
                     overflow: TextOverflow.ellipsis,

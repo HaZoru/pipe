@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:pipe/models/albumList.dart';
 import 'package:pipe/models/duration_state.dart';
 import 'package:pipe/models/server.dart';
 import 'package:pipe/screens/album_details_view.dart';
@@ -64,12 +65,13 @@ class _PlayerState extends State<Player> {
                           'albumDetails', // Optional, add name to your routes. Allows you navigate by name instead of path
                       path: 'albumDetails',
                       builder: (context, state) {
+                        AlbumMetaData albumMetaData =
+                            state.extra as AlbumMetaData;
                         return AlbumDetailsView(
                           pc: _pc,
                           server: server,
-                          albumCover: state.queryParams['albumCover']!,
+                          albumMetaData: albumMetaData,
                           audioplayer: _audioPlayer,
-                          id: state.queryParams['albumId']!,
                         );
                       }),
                 ]),
@@ -168,10 +170,12 @@ class _HomePageState extends State<HomePage> {
           color: Colors.black,
           child: AnimatedOpacity(
             opacity: opacity,
-            duration: Duration(
-              seconds: 1,
+            duration: Duration.zero,
+            child: NowPlaying(
+              widget._audioPlayer,
+              widget.durationState,
+              pc: widget._pc,
             ),
-            child: NowPlaying(widget._audioPlayer, widget.durationState),
           ),
         ),
         body: widget.child,
