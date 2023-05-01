@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/common_func/cover_art_url.dart';
-import 'package:pipe/models/albumList.dart';
+import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/server.dart';
 import 'package:http/http.dart' as http;
 import 'package:pipe/routes/models/album_details_route_data.dart';

@@ -1,5 +1,5 @@
 import 'package:just_audio/just_audio.dart';
-import 'package:pipe/models/albumList.dart';
+import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/server.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
