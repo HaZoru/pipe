@@ -51,7 +51,6 @@ class _ServerLoginState extends State<ServerLogin> {
                     password: password);
                 List<String> newServerList =
                     serverList + [jsonEncode(newServer.toJson())];
-                print(newServerList);
                 await prefs.setStringList('serverList', newServerList);
               },
               child: Text('Submit')),

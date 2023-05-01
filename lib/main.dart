@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pipe/routes/app_router.dart';
 import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  @override
+  const MyApp({Key? key}) : super(key: key);
+
   void main() {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent, // navigation bar color
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     ));
   }
 
+  @override
   Widget build(BuildContext context) {
     main();
     return MaterialApp.router(
