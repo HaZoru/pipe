@@ -3,6 +3,13 @@ class AudioMetadata {
   final String? album;
   final String? artwork;
   final String? artist;
+  final String? id;
 
-  AudioMetadata({this.artist, this.album, this.title, this.artwork});
+  AudioMetadata({
+    this.artist,
+    this.album,
+    this.title,
+    this.artwork,
+    this.id,
+  });
 }

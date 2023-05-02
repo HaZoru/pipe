@@ -16,39 +16,53 @@ class NowPlaying extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        foregroundColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
         toolbarHeight: 80,
         flexibleSpace: SafeArea(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Center(
-              child: IconButton(
-                icon: const Icon(Icons.expand_more),
-                onPressed: () {
-                  pc.close();
-                },
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Now Playing',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.expand_more),
+                    onPressed: () {
+                      pc.close();
+                    },
+                  ),
                 ),
-                StreamBuilder<SequenceState?>(
-                    stream: _audioPlayer.sequenceStateStream,
-                    builder: (context, snapshot) {
-                      final state = snapshot.data;
-                      final List sequence = state?.sequence ?? [];
-                      final int? current = state?.currentIndex;
-                      return Text(
-                        current != null ? sequence[current].tag.album : '',
-                        style: TextStyle(fontSize: 16),
-                      );
-                    })
-              ],
-            ),
-          ]),
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Now Playing',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 25),
+                      ),
+                      StreamBuilder<SequenceState?>(
+                          stream: _audioPlayer.sequenceStateStream,
+                          builder: (context, snapshot) {
+                            final state = snapshot.data;
+                            final List sequence = state?.sequence ?? [];
+                            final int? current = state?.currentIndex;
+                            return Text(
+                              current != null
+                                  ? sequence[current].tag.album
+                                  : '',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            );
+                          })
+                    ],
+                  ),
+                ),
+              ]),
         ),
       ),
       body: StreamBuilder<SequenceState?>(

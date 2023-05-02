@@ -21,8 +21,8 @@ class MiniPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      elevation: 10,
-      surfaceTintColor: Colors.teal,
+      surfaceTintColor: Theme.of(context).colorScheme.primary,
+      elevation: 4,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(4, 0, 4, 4),
         child: Column(
@@ -81,8 +81,6 @@ class MiniPlayer extends StatelessWidget {
                               Text(
                                 albumTitle,
                                 overflow: TextOverflow.ellipsis,
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.grey),
                               ),
                             ],
                           ),

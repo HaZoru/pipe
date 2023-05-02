@@ -37,11 +37,24 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin<Home> {
                 floating: true,
                 pinned: true,
                 snap: true,
-                bottom: TabBar(
-                  tabs: <Tab>[
-                    Tab(text: "Album"),
-                    Tab(text: "Artist"),
-                  ], // <-- total of 2 tabs
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(kToolbarHeight),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: TabBar(
+                      dividerColor: Colors.transparent,
+                      indicatorWeight: 2,
+                      isScrollable: true,
+                      tabs: <Tab>[
+                        Tab(
+                          icon: Icon(Icons.album),
+                        ),
+                        Tab(
+                          icon: Icon(Icons.people),
+                        ),
+                      ], // <-- total of 2 tabs
+                    ),
+                  ),
                 ),
               ),
             ];

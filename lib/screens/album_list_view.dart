@@ -74,50 +74,53 @@ class _AlbumListViewState extends State<AlbumListView>
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        cacheExtent: 1000,
-        itemCount: albumList.length + 1,
-        itemBuilder: (_, idx) {
-          if (idx == (albumList.length - 1)) {
-            appendAlbums();
-          }
-          if (idx == albumList.length) {
-            if (listIsOver) {
-              return const SizedBox(
-                height: 100,
+    super.build(context);
+    return Scrollbar(
+      interactive: true,
+      thickness: 10,
+      radius: Radius.circular(40),
+      child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
+          cacheExtent: 1000,
+          itemCount: albumList.length + 1,
+          itemBuilder: (_, idx) {
+            if (idx == (albumList.length - 1)) {
+              appendAlbums();
+            }
+            if (idx == albumList.length) {
+              if (listIsOver) {
+                return Container();
+              }
+              return Center(child: CircularProgressIndicator());
+            } else {
+              AlbumMetaData album = albumList[idx];
+              return ListTile(
+                splashColor: Colors.transparent,
+                onTap: () {
+                  context.pushNamed("albumDetails",
+                      extra: AlbumDetailsRouteData(
+                          widget.server, widget.audioPlayer, widget.pc, album));
+                },
+                leading: CachedNetworkImage(
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                    imageUrl:
+                        getAlbumCoverUrl(album.coverArt!, 100, widget.server)),
+                title: Text(
+                  album.title!,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                ),
+                subtitle: Text(
+                  album.artist!,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: Icon(Icons.more_horiz),
               );
             }
-          } else {
-            AlbumMetaData album = albumList[idx];
-            return ListTile(
-              onTap: () {
-                context.pushNamed("albumDetails",
-                    extra: AlbumDetailsRouteData(
-                        widget.server, widget.audioPlayer, widget.pc, album));
-              },
-              leading: CachedNetworkImage(
-                  height: 55,
-                  width: 55,
-                  fit: BoxFit.cover,
-                  imageUrl:
-                      getAlbumCoverUrl(album.coverArt!, 100, widget.server)),
-              title: Text(
-                album.title!,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-              ),
-              subtitle: Text(
-                album.artist!,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey),
-              ),
-              trailing: Icon(Icons.more_horiz),
-            );
-          }
-        });
+          }),
+    );
   }
 
   @override

@@ -21,7 +21,6 @@ class ShuffleButton extends StatelessWidget {
       icon: isEnabled
           ? Icon(
               Icons.shuffle,
-              color: Colors.teal,
               size: size,
             )
           : Icon(
@@ -62,12 +61,10 @@ class RepeatButton extends StatelessWidget {
       ),
       Icon(
         Icons.repeat,
-        color: Colors.teal,
         size: size,
       ),
       Icon(
         Icons.repeat_one,
-        color: Colors.teal,
         size: size,
       ),
     ];
@@ -151,7 +148,6 @@ class PlayPauseButton extends StatelessWidget {
         ? Container(
             child: determineIcon(),
             decoration: BoxDecoration(
-                color: Color.fromRGBO(24, 42, 55, 1),
                 borderRadius: BorderRadius.all(Radius.circular(50))),
           )
         : determineIcon();

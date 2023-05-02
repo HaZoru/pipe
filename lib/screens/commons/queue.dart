@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 class Queue extends StatelessWidget {
-  const Queue(this._audioPlayer, {Key? key}) : super(key: key);
+  const Queue({Key? key, required this.audioPlayer}) : super(key: key);
 
-  final AudioPlayer _audioPlayer;
+  final AudioPlayer audioPlayer;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<SequenceState?>(
-      stream: _audioPlayer.sequenceStateStream,
+      stream: audioPlayer.sequenceStateStream,
       builder: (context, snapshot) {
         final state = snapshot.data;
         final sequence = state?.sequence ?? [];
-        return ListView(
+        return Column(
           children: [
             for (var i = 0; i < sequence.length; i++)
               ListTile(
@@ -20,7 +20,7 @@ class Queue extends StatelessWidget {
                 leading: Image.network(sequence[i].tag.artwork),
                 title: Text(sequence[i].tag.title),
                 onTap: () {
-                  _audioPlayer.seek(Duration.zero, index: i);
+                  audioPlayer.seek(Duration.zero, index: i);
                 },
               ),
           ],
