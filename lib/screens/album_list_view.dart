@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:pipe/common_func/cover_art_url.dart';
+import 'package:pipe/utlities/cover_art_url.dart';
 import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/server.dart';
 import 'package:http/http.dart' as http;
@@ -97,6 +97,7 @@ class _AlbumListViewState extends State<AlbumListView>
               return ListTile(
                 splashColor: Colors.transparent,
                 onTap: () {
+                  print(widget.server);
                   context.pushNamed("albumDetails",
                       extra: AlbumDetailsRouteData(
                           widget.server, widget.audioPlayer, widget.pc, album));

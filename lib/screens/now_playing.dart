@@ -78,21 +78,27 @@ class NowPlaying extends StatelessWidget {
           final String albumTitle =
               current != null ? sequence[current].tag.album : '';
           return Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 70),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 if (current != null)
                   Flexible(
-                    flex: 4,
-                    child: Image(
-                      image: NetworkImage(sequence[current].tag.artwork),
-                      fit: BoxFit.cover,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Image(
+                          image: NetworkImage(sequence[current].tag.artwork),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   )
                 else
                   const Flexible(
-                    flex: 4,
                     child: Center(
                       child: Icon(Icons.audio_file),
                     ),
@@ -100,25 +106,23 @@ class NowPlaying extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                Flexible(
-                    flex: 1,
-                    child: SongDetails(
-                        songTitle: songTitle,
-                        artist: artist,
-                        albumTitle: albumTitle)),
-                Flexible(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      AudioProgressBar(
-                        _audioPlayer,
-                        durationState,
-                        noSeek: false,
-                      ),
-                      PlayerButtonsRow(audioPlayer: _audioPlayer),
-                    ],
-                  ),
-                )
+                SongDetails(
+                    songTitle: songTitle,
+                    artist: artist,
+                    albumTitle: albumTitle),
+                SizedBox(
+                  height: 10,
+                ),
+                Column(
+                  children: [
+                    AudioProgressBar(
+                      _audioPlayer,
+                      durationState,
+                      noSeek: false,
+                    ),
+                    PlayerButtonsRow(audioPlayer: _audioPlayer),
+                  ],
+                ),
               ],
             ),
           );
@@ -144,6 +148,7 @@ class SongDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
       children: [
         Text(
           songTitle,

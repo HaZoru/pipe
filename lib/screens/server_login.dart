@@ -1,8 +1,7 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pipe/models/server.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pipe/utlities/server_shared_prefs.dart';
+import 'package:pipe/utlities/unique_id_gen.dart';
 
 class ServerLogin extends StatefulWidget {
   const ServerLogin({Key? key}) : super(key: key);
@@ -39,20 +38,12 @@ class _ServerLoginState extends State<ServerLogin> {
             password = value;
           }),
           ElevatedButton(
-              onPressed: () async {
-                final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                final List<String> serverList =
-                    prefs.getStringList('serverList') ?? [];
-                Server newServer = Server(
-                    serverName: serverName,
-                    host: host,
-                    username: username,
-                    password: password);
-                List<String> newServerList =
-                    serverList + [jsonEncode(newServer.toJson())];
-                await prefs.setStringList('serverList', newServerList);
-              },
+              onPressed: () => addNewServer(Server(
+                  id: idGenerator(),
+                  serverName: serverName,
+                  host: host,
+                  username: username,
+                  password: password)),
               child: Text('Submit')),
         ],
       )),

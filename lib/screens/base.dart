@@ -27,13 +27,14 @@ class Base extends StatefulWidget {
 class _BaseState extends State<Base> {
   bool panelOpened = false;
   double opacity = 0;
-  late PanelController newpc;
+  late PanelController queuePc;
   bool queueHidden = true;
+  bool draggable = true;
 
   @override
   void initState() {
     // TODO: implement initState
-    newpc = PanelController();
+    queuePc = PanelController();
     super.initState();
   }
 
@@ -41,11 +42,9 @@ class _BaseState extends State<Base> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SlidingUpPanel(
+          isDraggable: true,
+          isPanelVisible: false,
           onPanelSlide: (position) {
-            if (position > 0.5 && queueHidden) {
-              // newpc.show();
-              queueHidden = false;
-            }
             setState(() {
               opacity = position;
             });
@@ -59,23 +58,13 @@ class _BaseState extends State<Base> {
           maxHeight: MediaQuery.of(context).size.height,
           minHeight: 80,
           panel: Scaffold(
-            body: SlidingUpPanel(
-              controller: newpc,
-              panel: Queue(
-                audioPlayer: widget.audioPlayer,
-              ),
-              maxHeight: MediaQuery.of(context).size.height,
-              body: Container(
-                color: Colors.black,
-                child: AnimatedOpacity(
-                  opacity: opacity,
-                  duration: Duration.zero,
-                  child: NowPlaying(
-                    widget.audioPlayer,
-                    widget.durationState,
-                    pc: widget.pc,
-                  ),
-                ),
+            body: AnimatedOpacity(
+              opacity: opacity,
+              duration: Duration.zero,
+              child: NowPlaying(
+                widget.audioPlayer,
+                widget.durationState,
+                pc: widget.pc,
               ),
             ),
           ),

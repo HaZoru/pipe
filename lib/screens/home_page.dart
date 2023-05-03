@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/server.dart';
 import 'package:pipe/screens/album_list_view.dart';
+import 'package:pipe/utlities/server_shared_prefs.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class Home extends StatefulWidget {
@@ -22,6 +24,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin<Home> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         body: DefaultTabController(
       length: 2,
@@ -29,7 +32,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin<Home> {
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
-              const SliverAppBar(
+              SliverAppBar(
                 title: Text(
                   'Pipe',
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.w800),
@@ -37,6 +40,14 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin<Home> {
                 floating: true,
                 pinned: true,
                 snap: true,
+                actions: [
+                  IconButton(
+                      icon: Icon(Icons.sync),
+                      onPressed: () async {
+                        await removeActiveServer();
+                        context.goNamed('serverList');
+                      }),
+                ],
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(kToolbarHeight),
                   child: Align(

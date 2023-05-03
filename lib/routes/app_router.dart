@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/duration_state.dart';
@@ -8,6 +11,7 @@ import 'package:pipe/screens/home_page.dart';
 import 'package:pipe/screens/base.dart';
 import 'package:pipe/screens/server_list.dart';
 import 'package:pipe/screens/server_login.dart';
+import 'package:pipe/utlities/server_shared_prefs.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -29,7 +33,15 @@ class AppRouter {
             )).asBroadcastStream();
 
     router = GoRouter(
-      redirect: (context, state) {},
+      debugLogDiagnostics: true,
+      redirect: (context, state) async {
+        if (state.location == '/serverlist') {
+          String? activeServer = await getActiveServer(asJson: true);
+          if (activeServer != null) {
+            return Uri.encodeFull("/home${activeServer}");
+          }
+        }
+      },
       initialLocation: '/serverlist',
       routes: [
         GoRoute(
@@ -42,8 +54,8 @@ class AppRouter {
             }),
         GoRoute(
             name:
-                'serverList', // Optional, add name to your routes. Allows you navigate by name instead of path
-            path: '/serverList',
+                'serverlist', // Optional, add name to your routes. Allows you navigate by name instead of path
+            path: '/serverlist',
             builder: (context, state) {
               //  serverList page
               return ServerList();
@@ -53,20 +65,24 @@ class AppRouter {
             GoRoute(
                 name:
                     'home', // Optional, add name to your routes. Allows you navigate by name instead of path
-                path: '/',
+                path: '/home:server',
                 builder: (context, state) {
-                  Server server = state.extra as Server;
+                  String? _server = state.params['server'];
+                  if (_server != null) {
+                    return Home(
+                      audioPlayer: _audioPlayer,
+                      pc: _pc,
+                      server: Server.fromJson(jsonDecode(_server)),
+                    );
+                  } else {
+                    return Text('no server provided');
+                  }
                   //  serverList page
-                  return Home(
-                    audioPlayer: _audioPlayer,
-                    pc: _pc,
-                    server: server,
-                  );
                 }),
             GoRoute(
                 name:
                     'albumDetails', // Optional, add name to your routes. Allows you navigate by name instead of path
-                path: '/albumDetails',
+                path: '/album-details',
                 builder: (context, state) {
                   AlbumDetailsRouteData albumDetailsRouteData =
                       state.extra as AlbumDetailsRouteData;
