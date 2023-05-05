@@ -3,6 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/duration_state.dart';
 import 'package:pipe/screens/commons/player_buttons.dart';
 import 'package:pipe/screens/commons/progress_bar.dart';
+import 'package:pipe/screens/commons/queue.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class NowPlaying extends StatelessWidget {
@@ -65,56 +66,50 @@ class NowPlaying extends StatelessWidget {
               ]),
         ),
       ),
-      body: StreamBuilder<SequenceState?>(
-        stream: _audioPlayer.sequenceStateStream,
-        builder: (context, snapshot) {
-          final state = snapshot.data;
-          final List sequence = state?.sequence ?? [];
-          final int? current = state?.currentIndex;
-          final String songTitle =
-              current != null ? sequence[current].tag.title : '';
-          final String artist =
-              current != null ? sequence[current].tag.artist : '';
-          final String albumTitle =
-              current != null ? sequence[current].tag.album : '';
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 70),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                if (current != null)
-                  Flexible(
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Image(
-                          image: NetworkImage(sequence[current].tag.artwork),
-                          fit: BoxFit.cover,
+      body: Stack(
+        children: [
+          StreamBuilder<SequenceState?>(
+            stream: _audioPlayer.sequenceStateStream,
+            builder: (context, snapshot) {
+              final state = snapshot.data;
+              final List sequence = state?.sequence ?? [];
+              final int? current = state?.currentIndex;
+              final String songTitle =
+                  current != null ? sequence[current].tag.title : '';
+              final String artist =
+                  current != null ? sequence[current].tag.artist : '';
+              final String albumTitle =
+                  current != null ? sequence[current].tag.album : '';
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 70),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (current != null)
+                      Flexible(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image(
+                              image: NetworkImage(
+                                  sequence[current].tag.artUri.toString()),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      const Flexible(
+                        child: Center(
+                          child: Icon(Icons.audio_file),
                         ),
                       ),
-                    ),
-                  )
-                else
-                  const Flexible(
-                    child: Center(
-                      child: Icon(Icons.audio_file),
-                    ),
-                  ),
-                const SizedBox(
-                  height: 10,
-                ),
-                SongDetails(
-                    songTitle: songTitle,
-                    artist: artist,
-                    albumTitle: albumTitle),
-                SizedBox(
-                  height: 10,
-                ),
-                Column(
-                  children: [
+                    SongDetails(
+                        songTitle: songTitle,
+                        artist: artist,
+                        albumTitle: albumTitle),
                     AudioProgressBar(
                       _audioPlayer,
                       durationState,
@@ -123,10 +118,24 @@ class NowPlaying extends StatelessWidget {
                     PlayerButtonsRow(audioPlayer: _audioPlayer),
                   ],
                 ),
-              ],
-            ),
-          );
-        },
+              );
+            },
+          ),
+          DraggableScrollableSheet(
+            minChildSize: 70 / MediaQuery.of(context).size.height,
+            initialChildSize: 70 / MediaQuery.of(context).size.height,
+            snap: true,
+            builder: (context, scrollController) {
+              return Material(
+                elevation: 4,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Queue(audioPlayer: _audioPlayer),
+                ),
+              );
+            },
+          )
+        ],
       ),
     );
   }

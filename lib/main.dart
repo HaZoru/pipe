@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:pipe/routes/app_router.dart';
 import 'package:flutter/services.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  void main() {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent, // navigation bar color
-      statusBarColor: Colors.transparent, // status bar color
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    main();
     return MaterialApp.router(
       routerConfig: AppRouter().router,
       debugShowCheckedModeBanner: false,

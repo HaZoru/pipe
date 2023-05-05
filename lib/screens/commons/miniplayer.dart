@@ -51,8 +51,8 @@ class MiniPlayer extends StatelessWidget {
                               height: 45,
                               width: 45,
                               fit: BoxFit.cover,
-                              image:
-                                  NetworkImage(sequence[current].tag.artwork)),
+                              image: NetworkImage(
+                                  sequence[current].tag.artUri.toString())),
                         )
                       else
                         const Padding(

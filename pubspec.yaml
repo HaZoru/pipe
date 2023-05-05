@@ -40,6 +40,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flex_color_scheme: ^7.0.5
   auto_size_text: ^3.0.0
+  just_audio_background: ^0.0.1-beta.9
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

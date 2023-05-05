@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:pipe/utlities/cover_art_url.dart';
 import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/album_info.dart';
@@ -166,12 +167,12 @@ class AlbumTrackList extends StatelessWidget {
             List<AudioSource> queue = [];
             for (Song song in songs) {
               queue.add(AudioSource.uri(getSongStream(song.id!),
-                  tag: AudioMetadata(
-                      title: song.title,
+                  tag: MediaItem(
+                      title: song.title!,
                       artist: song.artist,
                       album: song.album,
-                      artwork: albumCover,
-                      id: song.id)));
+                      artUri: Uri.parse(albumCover),
+                      id: song.id!)));
             }
             return Column(
               children: [
@@ -242,12 +243,15 @@ class SongTile extends StatelessWidget {
               child: Center(
                 child: Text(
                   song.track!.toString(),
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: isPlaying
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.white),
+                  style: isPlaying
+                      ? TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Theme.of(context).colorScheme.primary)
+                      : TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                 ),
               ),
             ),
