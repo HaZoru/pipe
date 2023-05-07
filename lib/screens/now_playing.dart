@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/duration_state.dart';
@@ -7,12 +8,24 @@ import 'package:pipe/screens/commons/queue.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class NowPlaying extends StatelessWidget {
-  const NowPlaying(this._audioPlayer, this.durationState,
-      {Key? key, required this.pc})
+  const NowPlaying(
+      {Key? key,
+      required this.audioPlayer,
+      required this.durationState,
+      required this.pc,
+      required this.title,
+      required this.album,
+      required this.artist,
+      required this.arturl})
       : super(key: key);
-  final AudioPlayer _audioPlayer;
+  final AudioPlayer audioPlayer;
   final Stream<DurationState> durationState;
   final PanelController pc;
+  final String title;
+  final String album;
+  final String artist;
+  final String? arturl;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +37,7 @@ class NowPlaying extends StatelessWidget {
         flexibleSpace: SafeArea(
           child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Center(
                   child: IconButton(
@@ -34,33 +47,30 @@ class NowPlaying extends StatelessWidget {
                     },
                   ),
                 ),
-                Flexible(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Now Playing',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 25),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      StreamBuilder<SequenceState?>(
-                          stream: _audioPlayer.sequenceStateStream,
-                          builder: (context, snapshot) {
-                            final state = snapshot.data;
-                            final List sequence = state?.sequence ?? [];
-                            final int? current = state?.currentIndex;
-                            return Text(
-                              current != null
-                                  ? sequence[current].tag.album
-                                  : '',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                            );
-                          })
+                      Text(album,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge),
                     ],
+                  ),
+                ),
+                Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () {
+                      // TODO
+                    },
                   ),
                 ),
               ]),
@@ -68,58 +78,45 @@ class NowPlaying extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          StreamBuilder<SequenceState?>(
-            stream: _audioPlayer.sequenceStateStream,
-            builder: (context, snapshot) {
-              final state = snapshot.data;
-              final List sequence = state?.sequence ?? [];
-              final int? current = state?.currentIndex;
-              final String songTitle =
-                  current != null ? sequence[current].tag.title : '';
-              final String artist =
-                  current != null ? sequence[current].tag.artist : '';
-              final String albumTitle =
-                  current != null ? sequence[current].tag.album : '';
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 70),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (current != null)
-                      Flexible(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: Image(
-                              image: NetworkImage(
-                                  sequence[current].tag.artUri.toString()),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      )
-                    else
-                      const Flexible(
-                        child: Center(
-                          child: Icon(Icons.audio_file),
-                        ),
-                      ),
-                    SongDetails(
-                        songTitle: songTitle,
-                        artist: artist,
-                        albumTitle: albumTitle),
-                    AudioProgressBar(
-                      _audioPlayer,
-                      durationState,
-                      noSeek: false,
-                    ),
-                    PlayerButtonsRow(audioPlayer: _audioPlayer),
-                  ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 70),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: AspectRatio(
+                        aspectRatio: 1,
+                        child: CachedNetworkImage(
+                          imageUrl: arturl ?? '',
+                          placeholder: (context, url) {
+                            return const Center(
+                              child: Icon(Icons.audio_file),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return const Center(
+                              child: Icon(Icons.audio_file),
+                            );
+                          },
+                        )),
+                  ),
                 ),
-              );
-            },
+                SongDetails(
+                    songTitle: title, artist: artist, albumTitle: album),
+                SizedBox(
+                  height: 10,
+                ),
+                AudioProgressBar(
+                  audioPlayer,
+                  durationState,
+                  noSeek: false,
+                ),
+                PlayerButtonsRow(audioPlayer: audioPlayer),
+              ],
+            ),
           ),
           DraggableScrollableSheet(
             minChildSize: 70 / MediaQuery.of(context).size.height,
@@ -130,7 +127,7 @@ class NowPlaying extends StatelessWidget {
                 elevation: 4,
                 child: SingleChildScrollView(
                   controller: scrollController,
-                  child: Queue(audioPlayer: _audioPlayer),
+                  child: Queue(audioPlayer: audioPlayer),
                 ),
               );
             },
@@ -225,7 +222,7 @@ class PlayerButtonsRow extends StatelessWidget {
             final playerState = snapshot.data;
             return PlayPauseButton(
                 withRoundContainer: true,
-                size: 60,
+                size: 40,
                 audioPlayer: _audioPlayer,
                 playerState: playerState);
           },

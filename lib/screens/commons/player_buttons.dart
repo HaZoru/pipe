@@ -22,6 +22,7 @@ class ShuffleButton extends StatelessWidget {
           ? Icon(
               Icons.shuffle,
               size: size,
+              color: Theme.of(context).colorScheme.primary,
             )
           : Icon(
               Icons.shuffle,
@@ -59,14 +60,10 @@ class RepeatButton extends StatelessWidget {
         Icons.repeat,
         size: size,
       ),
-      Icon(
-        Icons.repeat,
-        size: size,
-      ),
-      Icon(
-        Icons.repeat_one,
-        size: size,
-      ),
+      Icon(Icons.repeat,
+          size: size, color: Theme.of(context).colorScheme.primary),
+      Icon(Icons.repeat_one,
+          size: size, color: Theme.of(context).colorScheme.primary),
     ];
     const cycleModes = [
       LoopMode.off,
@@ -146,9 +143,11 @@ class PlayPauseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return withRoundContainer
         ? Container(
+            padding: const EdgeInsets.all(8),
             child: determineIcon(),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(50))),
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: const BorderRadius.all(Radius.circular(40))),
           )
         : determineIcon();
   }
@@ -159,9 +158,9 @@ class PlayPauseButton extends StatelessWidget {
         processingState == ProcessingState.buffering) {
       return Container(
         margin: EdgeInsets.all(8.0),
-        width: 64.0,
-        height: 64.0,
-        child: CircularProgressIndicator(),
+        height: size,
+        width: size,
+        child: Center(child: CircularProgressIndicator()),
       );
     } else if (audioPlayer.playing != true) {
       return IconButton(

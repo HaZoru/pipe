@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:pipe/utlities/cover_art_url.dart';
 import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/server.dart';
@@ -11,7 +12,7 @@ import 'package:pipe/routes/models/album_details_route_data.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class AlbumListView extends StatefulWidget {
-  AlbumListView({
+  const AlbumListView({
     Key? key,
     required this.server,
     required this.audioPlayer,
@@ -78,7 +79,7 @@ class _AlbumListViewState extends State<AlbumListView>
     return Scrollbar(
       interactive: true,
       thickness: 10,
-      radius: Radius.circular(40),
+      radius: const Radius.circular(40),
       child: ListView.builder(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
           cacheExtent: 1000,
@@ -91,34 +92,14 @@ class _AlbumListViewState extends State<AlbumListView>
               if (listIsOver) {
                 return Container();
               }
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else {
               AlbumMetaData album = albumList[idx];
-              return ListTile(
-                splashColor: Colors.transparent,
-                onTap: () {
-                  print(widget.server);
-                  context.pushNamed("albumDetails",
-                      extra: AlbumDetailsRouteData(
-                          widget.server, widget.audioPlayer, widget.pc, album));
-                },
-                leading: CachedNetworkImage(
-                    height: 50,
-                    width: 50,
-                    fit: BoxFit.cover,
-                    imageUrl:
-                        getAlbumCoverUrl(album.coverArt!, 100, widget.server)),
-                title: Text(
-                  album.title!,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-                ),
-                subtitle: Text(
-                  album.artist!,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                trailing: Icon(Icons.more_horiz),
-              );
+              return AlbumListTile(
+                  album: album,
+                  server: widget.server,
+                  audioPlayer: widget.audioPlayer,
+                  pc: widget.pc);
             }
           }),
     );
@@ -127,4 +108,54 @@ class _AlbumListViewState extends State<AlbumListView>
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
+}
+
+class AlbumListTile extends StatelessWidget {
+  const AlbumListTile({
+    Key? key,
+    required this.album,
+    required this.server,
+    required this.audioPlayer,
+    required this.pc,
+  }) : super(key: key);
+
+  final AlbumMetaData album;
+  final Server server;
+  final AudioPlayer audioPlayer;
+  final PanelController pc;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<SequenceState?>(
+        stream: audioPlayer.sequenceStateStream,
+        builder: (context, snapshot) {
+          final MediaItem? mediaItem = snapshot.data?.currentSource?.tag;
+          final String albumId = mediaItem?.extras?["albumId"] ?? '';
+          final bool isPlaying = album.id == albumId;
+          return ListTile(
+            splashColor: Colors.transparent,
+            onTap: () {
+              context.pushNamed("albumDetails",
+                  extra: AlbumDetailsRouteData(server, audioPlayer, pc, album));
+            },
+            selected: isPlaying,
+            leading: CachedNetworkImage(
+                height: 50,
+                width: 50,
+                fit: BoxFit.cover,
+                imageUrl: getAlbumCoverUrl(album.coverArt!, 100, server)),
+            title: Text(
+              album.title!,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            subtitle: Text(
+              album.artist!,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            trailing: const Icon(Icons.more_horiz),
+          );
+        });
+  }
 }

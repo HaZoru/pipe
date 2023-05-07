@@ -4,10 +4,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:pipe/screens/commons/song_tile.dart';
 import 'package:pipe/utlities/cover_art_url.dart';
 import 'package:pipe/models/album_list.dart';
 import 'package:pipe/models/album_info.dart';
-import 'package:pipe/models/audio_metadata.dart';
 import 'package:pipe/models/server.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -43,10 +43,8 @@ class AlbumDetailsView extends StatelessWidget {
                 width: 250,
                 imageUrl: albumCover,
                 placeholder: (context, url) {
-                  return Container(
-                    child: const Center(
-                      child: Icon(Icons.music_note),
-                    ),
+                  return const Center(
+                    child: Icon(Icons.music_note),
                   );
                 },
               ),
@@ -65,15 +63,24 @@ class AlbumDetailsView extends StatelessWidget {
                   ),
                   Text(
                     albumMetaData.name!,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   Text(
                     albumMetaData.artist!,
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(color: Colors.grey),
                   ),
                   Text(
                     "${albumMetaData.year!} • ${albumMetaData.songCount!} Songs",
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(color: Colors.grey),
                   ),
                 ],
               ),
@@ -89,7 +96,7 @@ class AlbumDetailsView extends StatelessWidget {
                     'Songs',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.teal,
+                        color: Theme.of(context).indicatorColor,
                         fontSize: 16),
                   ),
                 ],
@@ -171,6 +178,7 @@ class AlbumTrackList extends StatelessWidget {
                       title: song.title!,
                       artist: song.artist,
                       album: song.album,
+                      extras: {"albumId": song.albumId},
                       artUri: Uri.parse(albumCover),
                       id: song.id!)));
             }
@@ -183,89 +191,12 @@ class AlbumTrackList extends StatelessWidget {
                       songs: songs,
                       song: song,
                       pc: pc),
-                SizedBox(
+                const SizedBox(
                   height: 100,
                 )
               ],
             );
           }
         }));
-  }
-}
-
-class SongTile extends StatelessWidget {
-  SongTile({
-    Key? key,
-    required this.audioplayer,
-    required this.queue,
-    required this.songs,
-    required this.song,
-    required this.pc,
-  }) : super(key: key);
-
-  final AudioPlayer audioplayer;
-  final List<AudioSource> queue;
-  final List<Song> songs;
-  final Song song;
-  final PanelController pc;
-  bool isPlaying = false;
-
-  @override
-  Widget build(BuildContext context) {
-    int seconds = song.duration!;
-    Map timeStamp = {
-      'min': (seconds / 60).floor().toString(),
-      'sec': (seconds % 60).toString().padLeft(2, '0')
-    };
-    return StreamBuilder<SequenceState?>(
-        stream: audioplayer.sequenceStateStream,
-        builder: (context, snapshot) {
-          final state = snapshot.data;
-          final List sequence = state?.sequence ?? [];
-          final int? current = state?.currentIndex;
-
-          if (current != null) {
-            isPlaying = sequence[current].tag.id == song.id ? true : false;
-          }
-          return ListTile(
-            onTap: () {
-              audioplayer.stop();
-              audioplayer
-                  .setAudioSource(ConcatenatingAudioSource(children: queue));
-              audioplayer.seek(Duration.zero, index: songs.indexOf(song));
-              audioplayer.play();
-              pc.show();
-            },
-            leading: Container(
-              height: 45,
-              width: 45,
-              color: Colors.grey[800],
-              child: Center(
-                child: Text(
-                  song.track!.toString(),
-                  style: isPlaying
-                      ? TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: Theme.of(context).colorScheme.primary)
-                      : TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                ),
-              ),
-            ),
-            trailing: Icon(Icons.more_horiz),
-            title: Text(
-              song.title!,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: isPlaying
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.white),
-            ),
-            subtitle: Text("${timeStamp['min']}:${timeStamp['sec']}"),
-          );
-        });
   }
 }

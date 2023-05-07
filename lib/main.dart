@@ -80,7 +80,7 @@ class MyApp extends StatelessWidget {
         // fontFamily: GoogleFonts.notoSans().fontFamily,
       ),
       darkTheme: FlexThemeData.dark(
-        scheme: FlexScheme.tealM3,
+        scheme: FlexScheme.mandyRed,
         usedColors: 1,
         surfaceMode: FlexSurfaceMode.highBackgroundLowScaffold,
         blendLevel: 4,

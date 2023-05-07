@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -13,7 +14,20 @@ class Queue extends StatelessWidget {
           height: 70,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [Icon(Icons.horizontal_rule_rounded), Text('Queue')],
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.horizontal_rule_rounded,
+                weight: 40,
+              ),
+              Text(
+                'Queue',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              )
+            ],
           ),
         ),
         StreamBuilder<SequenceState?>(
@@ -26,8 +40,17 @@ class Queue extends StatelessWidget {
                 for (var i = 0; i < sequence.length; i++)
                   ListTile(
                     selected: i == state?.currentIndex,
-                    leading: Image.network(sequence[i].tag.artUri.toString()),
-                    title: Text(sequence[i].tag.title),
+                    leading: CachedNetworkImage(
+                        height: 50,
+                        width: 50,
+                        fit: BoxFit.cover,
+                        imageUrl: sequence[i].tag.artUri.toString()),
+                    title: Text(
+                      sequence[i].tag.title,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(sequence[i].tag.album,
+                        overflow: TextOverflow.ellipsis),
                     onTap: () {
                       audioPlayer.seek(Duration.zero, index: i);
                     },

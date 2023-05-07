@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/duration_state.dart';
@@ -8,15 +9,20 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({
     Key? key,
-    required AudioPlayer audioPlayer,
+    required this.audioPlayer,
     required this.durationState,
     required this.pc,
-  })  : _audioPlayer = audioPlayer,
-        super(key: key);
+    required this.title,
+    required this.album,
+    this.arturl,
+  }) : super(key: key);
 
-  final AudioPlayer _audioPlayer;
+  final AudioPlayer audioPlayer;
   final Stream<DurationState> durationState;
   final PanelController pc;
+  final String title;
+  final String album;
+  final String? arturl;
 
   @override
   Widget build(BuildContext context) {
@@ -29,41 +35,31 @@ class MiniPlayer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             StreamBuilder<SequenceState?>(
-              stream: _audioPlayer.sequenceStateStream,
+              stream: audioPlayer.sequenceStateStream,
               builder: (context, snapshot) {
-                final state = snapshot.data;
-                final sequence = state?.sequence ?? [];
-                final current = state?.currentIndex;
-                final String songTitle =
-                    current != null ? sequence[current].tag.title : '';
-                final String artist =
-                    current != null ? sequence[current].tag.artist : '';
-                final String albumTitle =
-                    current != null ? sequence[current].tag.album : '';
                 return Expanded(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      if (current != null)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(3, 0, 8, 0),
-                          child: Image(
-                              height: 45,
-                              width: 45,
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                  sequence[current].tag.artUri.toString())),
-                        )
-                      else
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(3, 0, 8, 0),
-                          child: SizedBox(
-                              height: 45,
-                              width: 45,
-                              child: Center(
-                                child: Icon(Icons.audio_file),
-                              )),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(3, 0, 8, 0),
+                        child: CachedNetworkImage(
+                          imageUrl: arturl ?? '',
+                          height: 45,
+                          width: 45,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) {
+                            return const Center(
+                              child: Icon(Icons.audio_file),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return const Center(
+                              child: Icon(Icons.audio_file),
+                            );
+                          },
                         ),
+                      ),
                       Expanded(
                         flex: 4,
                         child: GestureDetector(
@@ -75,11 +71,11 @@ class MiniPlayer extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                songTitle,
+                                title,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                albumTitle,
+                                album,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
@@ -89,19 +85,19 @@ class MiniPlayer extends StatelessWidget {
                       Row(
                         children: [
                           StreamBuilder<PlayerState>(
-                            stream: _audioPlayer.playerStateStream,
+                            stream: audioPlayer.playerStateStream,
                             builder: (_, snapshot) {
                               final playerState = snapshot.data;
                               return PlayPauseButton(
-                                audioPlayer: _audioPlayer,
+                                audioPlayer: audioPlayer,
                                 playerState: playerState,
                               );
                             },
                           ),
                           StreamBuilder<SequenceState?>(
-                            stream: _audioPlayer.sequenceStateStream,
+                            stream: audioPlayer.sequenceStateStream,
                             builder: (_, __) {
-                              return NextButton(audioPlayer: _audioPlayer);
+                              return NextButton(audioPlayer: audioPlayer);
                             },
                           ),
                         ],
@@ -112,7 +108,7 @@ class MiniPlayer extends StatelessWidget {
               },
             ),
             AudioProgressBar(
-              _audioPlayer,
+              audioPlayer,
               durationState,
               noSeek: true,
             ),
