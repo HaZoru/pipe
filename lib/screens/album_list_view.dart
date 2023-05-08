@@ -76,11 +76,8 @@ class _AlbumListViewState extends State<AlbumListView>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Scrollbar(
-      interactive: true,
-      thickness: 10,
-      radius: const Radius.circular(40),
-      child: ListView.builder(
+    return Scaffold(
+      body: ListView.builder(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 100),
           cacheExtent: 1000,
           itemCount: albumList.length + 1,

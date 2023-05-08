@@ -31,6 +31,7 @@ class SongTile extends StatelessWidget {
         stream: audioplayer.sequenceStateStream,
         builder: (context, snapshot) {
           final state = snapshot.data;
+          bool isPlayingAlbum = state?.currentSource?.tag.album == song.album;
           final List sequence = state?.sequence ?? [];
           final int? current = state?.currentIndex;
 
@@ -39,12 +40,18 @@ class SongTile extends StatelessWidget {
           }
           return ListTile(
             onTap: () {
-              audioplayer.stop();
-              audioplayer
-                  .setAudioSource(ConcatenatingAudioSource(children: queue));
-              audioplayer.seek(Duration.zero, index: songs.indexOf(song));
-              audioplayer.play();
-              pc.show();
+              if (isPlayingAlbum) {
+                print('alreaddy playing same album');
+                audioplayer.seek(Duration.zero, index: songs.indexOf(song));
+              } else {
+                print('adding new');
+                audioplayer.pause();
+                audioplayer.setAudioSource(
+                    ConcatenatingAudioSource(children: queue),
+                    initialIndex: songs.indexOf(song));
+                audioplayer.play();
+                pc.show();
+              }
             },
             leading: Container(
               height: 45,
@@ -52,7 +59,7 @@ class SongTile extends StatelessWidget {
               color: Colors.grey[800],
               child: Center(
                 child: Text(
-                  song.track!.toString(),
+                  song.track?.toString() ?? '?',
                   style: isPlaying
                       ? TextStyle(
                           fontWeight: FontWeight.bold,

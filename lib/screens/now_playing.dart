@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:marquee/marquee.dart';
 import 'package:pipe/models/duration_state.dart';
+import 'package:pipe/screens/commons/marquee_text.dart';
 import 'package:pipe/screens/commons/player_buttons.dart';
 import 'package:pipe/screens/commons/progress_bar.dart';
 import 'package:pipe/screens/commons/queue.dart';
@@ -156,26 +158,32 @@ class SongDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Text(
-          songTitle,
-          style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              overflow: TextOverflow.ellipsis),
+        MarqueeWidget(
+          child: Text(
+            songTitle,
+            style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis),
+          ),
         ),
-        Text(
-          artist,
-          style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-              overflow: TextOverflow.ellipsis),
+        MarqueeWidget(
+          child: Text(
+            artist,
+            style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                overflow: TextOverflow.ellipsis),
+          ),
         ),
-        Text(
-          albumTitle,
-          style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-              overflow: TextOverflow.ellipsis),
+        MarqueeWidget(
+          child: Text(
+            albumTitle,
+            style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                overflow: TextOverflow.ellipsis),
+          ),
         ),
       ],
     );

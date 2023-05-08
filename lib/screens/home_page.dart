@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:pipe/models/server.dart';
 import 'package:pipe/screens/album_list_view.dart';
+import 'package:pipe/screens/artist_list_view.dart';
 import 'package:pipe/utlities/server_shared_prefs.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -76,7 +77,9 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin<Home> {
                   server: widget.server,
                   audioPlayer: widget.audioPlayer,
                   pc: widget.pc),
-              Placeholder(),
+              ArtistListView(
+                server: widget.server,
+              ),
             ],
           ),
         ),
